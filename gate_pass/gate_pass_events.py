@@ -925,3 +925,305 @@ def get_gate_inwards_for_get_items(doctype, txt, searchfield, start, page_len, f
     except Exception as e:
         frappe.log_error(f"Error getting Gate Inwards for Get Items From: {str(e)}")
         return [] 
+
+@frappe.whitelist()
+def fetch_items_from_supplier_quotation(purchase_receipt, supplier_quotation):
+    """Fetch items from Supplier Quotation to Purchase Receipt"""
+    try:
+        # Check if purchase receipt exists
+        if not frappe.db.exists("Purchase Receipt", purchase_receipt):
+            frappe.throw(_("Purchase Receipt {0} not found").format(purchase_receipt))
+        
+        pr_doc = frappe.get_doc("Purchase Receipt", purchase_receipt)
+        
+        # Check if document is already submitted
+        if pr_doc.docstatus == 1:
+            frappe.throw(_("Purchase Receipt already submitted. Cannot fetch items."))
+        
+        sq_doc = frappe.get_doc("Supplier Quotation", supplier_quotation)
+        
+        # Validate that Supplier Quotation is submitted
+        if sq_doc.docstatus != 1:
+            frappe.throw(_("Supplier Quotation {0} is not submitted").format(supplier_quotation))
+        
+        # Validate supplier match
+        if pr_doc.supplier and sq_doc.supplier and pr_doc.supplier != sq_doc.supplier:
+            frappe.throw(_("Supplier mismatch. Purchase Receipt supplier {0} does not match Supplier Quotation supplier {1}").format(pr_doc.supplier, sq_doc.supplier))
+        
+        # Set supplier if not already set
+        if not pr_doc.supplier and sq_doc.supplier:
+            pr_doc.supplier = sq_doc.supplier
+        
+        # Clear existing items
+        pr_doc.items = []
+        
+        # Add items from Supplier Quotation
+        for sq_item in sq_doc.items:
+            # Validate that item_code exists
+            if not sq_item.item_code:
+                frappe.throw(_("Item Code is missing in Supplier Quotation item"))
+            
+            # Get item details to ensure we have all required fields
+            try:
+                item_doc = frappe.get_doc("Item", sq_item.item_code)
+            except Exception as e:
+                frappe.throw(_("Item {0} not found in Item master").format(sq_item.item_code))
+            
+            # Ensure we have all required data
+            item_name = sq_item.item_name or item_doc.item_name
+            uom = sq_item.uom or item_doc.stock_uom
+            
+            if not item_name:
+                frappe.throw(_("Item Name is missing for item {0}").format(sq_item.item_code))
+            
+            if not uom:
+                frappe.throw(_("UOM is missing for item {0}").format(sq_item.item_code))
+            
+            pr_doc.append("items", {
+                "item_code": sq_item.item_code,
+                "item_name": item_name,
+                "description": sq_item.description or "",
+                "qty": sq_item.qty,
+                "received_qty": sq_item.qty,  # Required field
+                "uom": uom,
+                "stock_uom": item_doc.stock_uom,  # Required field
+                "conversion_factor": sq_item.conversion_factor or 1.0,  # Required field
+                "warehouse": sq_item.warehouse,
+                "rate": sq_item.rate or 0,  # Required field
+                "base_rate": sq_item.rate or 0,  # Required field
+                "amount": (sq_item.qty or 0) * (sq_item.rate or 0),
+                "base_amount": (sq_item.qty or 0) * (sq_item.rate or 0),
+                "supplier_quotation": supplier_quotation,  # Track source
+                "supplier_quotation_item": sq_item.name  # Track source item
+            })
+        
+        pr_doc.save()
+        return True
+        
+    except Exception as e:
+        frappe.log_error(f"Error fetching items from Supplier Quotation {supplier_quotation} to Purchase Receipt {purchase_receipt}: {str(e)}")
+        return False 
+
+@frappe.whitelist()
+def fetch_items_from_purchase_order(purchase_receipt, purchase_order):
+    """Fetch items from Purchase Order to Purchase Receipt"""
+    try:
+        frappe.logger().info(f"Starting fetch_items_from_purchase_order: PR={purchase_receipt}, PO={purchase_order}")
+        
+        # Try to get the purchase receipt document, create new if doesn't exist
+        try:
+            if frappe.db.exists("Purchase Receipt", purchase_receipt):
+                pr_doc = frappe.get_doc("Purchase Receipt", purchase_receipt)
+                frappe.logger().info(f"Found existing PR: {purchase_receipt}")
+            else:
+                # Create a new document with the given name
+                pr_doc = frappe.new_doc("Purchase Receipt")
+                pr_doc.name = purchase_receipt
+                frappe.logger().info(f"Created new PR with name: {purchase_receipt}")
+        except Exception as e:
+            frappe.logger().error(f"Error getting/creating PR document: {str(e)}")
+            # Create a new document as fallback
+            pr_doc = frappe.new_doc("Purchase Receipt")
+            pr_doc.name = purchase_receipt
+        
+        # Check if document is already submitted
+        if hasattr(pr_doc, 'docstatus') and pr_doc.docstatus == 1:
+            frappe.throw(_("Purchase Receipt already submitted. Cannot fetch items."))
+        
+        po_doc = frappe.get_doc("Purchase Order", purchase_order)
+        
+        # Validate that Purchase Order is submitted
+        if po_doc.docstatus != 1:
+            frappe.throw(_("Purchase Order {0} is not submitted").format(purchase_order))
+        
+        # Set supplier if not already set
+        if not pr_doc.supplier and po_doc.supplier:
+            pr_doc.supplier = po_doc.supplier
+        
+        # Clear existing items
+        frappe.logger().info(f"Clearing existing items from PR {purchase_receipt}")
+        pr_doc.items = []
+        
+        # Add items from Purchase Order
+        frappe.logger().info(f"Processing {len(po_doc.items)} items from PO {purchase_order}")
+        
+        items_added = 0
+        for po_item in po_doc.items:
+            frappe.logger().info(f"Processing PO item: {po_item.item_code}, qty: {po_item.qty}")
+            
+            # Calculate remaining quantity to receive
+            received_qty = frappe.db.sql("""
+                SELECT COALESCE(SUM(pr_item.qty), 0) as received_qty
+                FROM `tabPurchase Receipt Item` pr_item
+                INNER JOIN `tabPurchase Receipt` pr ON pr_item.parent = pr.name
+                WHERE pr_item.purchase_order_item = %s
+                AND pr.docstatus = 1
+            """, po_item.name, as_dict=True)
+            
+            remaining_qty = po_item.qty - (received_qty[0].received_qty or 0)
+            frappe.logger().info(f"Remaining qty for {po_item.item_code}: {remaining_qty}")
+            
+            if remaining_qty > 0:
+                # Validate that item_code exists
+                if not po_item.item_code:
+                    frappe.throw(_("Item Code is missing in Purchase Order item"))
+                
+                # Get item details to ensure we have all required fields
+                try:
+                    item_doc = frappe.get_doc("Item", po_item.item_code)
+                except Exception as e:
+                    frappe.throw(_("Item {0} not found in Item master").format(po_item.item_code))
+                
+                # Ensure we have all required data
+                item_name = po_item.item_name or item_doc.item_name
+                uom = po_item.uom or item_doc.stock_uom
+                
+                if not item_name:
+                    frappe.throw(_("Item Name is missing for item {0}").format(po_item.item_code))
+                
+                if not uom:
+                    frappe.throw(_("UOM is missing for item {0}").format(po_item.item_code))
+                
+                pr_doc.append("items", {
+                    "item_code": po_item.item_code,
+                    "item_name": item_name,
+                    "description": po_item.description or "",
+                    "qty": remaining_qty,
+                    "received_qty": remaining_qty,  # Required field
+                    "uom": uom,
+                    "stock_uom": item_doc.stock_uom,  # Required field
+                    "conversion_factor": po_item.conversion_factor or 1.0,  # Required field
+                    "warehouse": po_item.warehouse,
+                    "rate": po_item.rate or 0,  # Required field
+                    "base_rate": po_item.base_rate or 0,  # Required field
+                    "amount": remaining_qty * (po_item.rate or 0),
+                    "base_amount": remaining_qty * (po_item.base_rate or 0),
+                    "purchase_order": purchase_order,  # Track source
+                    "purchase_order_item": po_item.name  # Track source item
+                })
+                frappe.logger().info(f"Added item {po_item.item_code} with qty {remaining_qty} to PR")
+                items_added += 1
+        
+        frappe.logger().info(f"Total items added to PR: {items_added}")
+        frappe.logger().info(f"PR items count before save: {len(pr_doc.items)}")
+        
+        # Save the document
+        pr_doc.save()
+        frappe.logger().info(f"PR saved successfully")
+        
+        # Verify the items were actually saved
+        saved_pr = frappe.get_doc("Purchase Receipt", purchase_receipt)
+        frappe.logger().info(f"PR items count after save: {len(saved_pr.items)}")
+        for i, item in enumerate(saved_pr.items):
+            frappe.logger().info(f"Saved item {i+1}: {item.item_code}, {item.item_name}, {item.qty}")
+        
+        frappe.logger().info(f"Successfully fetched items from PO {purchase_order} to PR {purchase_receipt}")
+        return True
+        
+    except Exception as e:
+        frappe.logger().error(f"Error fetching items from Purchase Order {purchase_order} to Purchase Receipt {purchase_receipt}: {str(e)}")
+        frappe.log_error(f"Error fetching items from Purchase Order {purchase_order} to Purchase Receipt {purchase_receipt}: {str(e)}")
+        return False 
+
+@frappe.whitelist()
+def test_purchase_order_items(purchase_order):
+    """Test method to check Purchase Order items"""
+    try:
+        po_doc = frappe.get_doc("Purchase Order", purchase_order)
+        result = {
+            'name': po_doc.name,
+            'supplier': po_doc.supplier,
+            'docstatus': po_doc.docstatus,
+            'status': po_doc.status,
+            'items': []
+        }
+        
+        for item in po_doc.items:
+            # Calculate remaining quantity to receive
+            received_qty = frappe.db.sql("""
+                SELECT COALESCE(SUM(pr_item.qty), 0) as received_qty
+                FROM `tabPurchase Receipt Item` pr_item
+                INNER JOIN `tabPurchase Receipt` pr ON pr_item.parent = pr.name
+                WHERE pr_item.purchase_order_item = %s
+                AND pr.docstatus = 1
+            """, item.name, as_dict=True)
+            
+            remaining_qty = item.qty - (received_qty[0].received_qty or 0)
+            
+            result['items'].append({
+                'item_code': item.item_code,
+                'item_name': item.item_name,
+                'qty': item.qty,
+                'received_qty': received_qty[0].received_qty or 0,
+                'remaining_qty': remaining_qty,
+                'uom': item.uom,
+                'rate': item.rate
+            })
+        
+        return result
+        
+    except Exception as e:
+        frappe.logger().error(f"Error testing PO {purchase_order}: {str(e)}")
+        return {'error': str(e)}
+
+@frappe.whitelist()
+def fetch_items_from_purchase_order_for_form(purchase_receipt_name, purchase_order):
+    """Fetch items from Purchase Order for form (without requiring document to exist in DB)"""
+    try:
+        frappe.logger().info(f"Starting fetch_items_from_purchase_order_for_form: PR={purchase_receipt_name}, PO={purchase_order}")
+        
+        po_doc = frappe.get_doc("Purchase Order", purchase_order)
+        
+        # Validate that Purchase Order is submitted
+        if po_doc.docstatus != 1:
+            return {"status": "error", "message": f"Purchase Order {purchase_order} is not submitted"}
+        
+        # Prepare items data
+        items_data = []
+        for po_item in po_doc.items:
+            # Calculate remaining quantity to receive
+            received_qty = frappe.db.sql("""
+                SELECT COALESCE(SUM(pr_item.qty), 0) as received_qty
+                FROM `tabPurchase Receipt Item` pr_item
+                INNER JOIN `tabPurchase Receipt` pr ON pr_item.parent = pr.name
+                WHERE pr_item.purchase_order_item = %s
+                AND pr.docstatus = 1
+            """, po_item.name, as_dict=True)
+            
+            remaining_qty = po_item.qty - (received_qty[0].received_qty or 0)
+            
+            if remaining_qty > 0:
+                # Get item details
+                try:
+                    item_doc = frappe.get_doc("Item", po_item.item_code)
+                except Exception as e:
+                    continue  # Skip this item if not found
+                
+                items_data.append({
+                    "item_code": po_item.item_code,
+                    "item_name": po_item.item_name or item_doc.item_name,
+                    "description": po_item.description or "",
+                    "qty": remaining_qty,
+                    "received_qty": remaining_qty,
+                    "uom": po_item.uom or item_doc.stock_uom,
+                    "stock_uom": item_doc.stock_uom,
+                    "conversion_factor": po_item.conversion_factor or 1.0,
+                    "warehouse": po_item.warehouse,
+                    "rate": po_item.rate or 0,
+                    "base_rate": po_item.base_rate or 0,
+                    "amount": remaining_qty * (po_item.rate or 0),
+                    "base_amount": remaining_qty * (po_item.base_rate or 0),
+                    "purchase_order": purchase_order,
+                    "purchase_order_item": po_item.name
+                })
+        
+        return {
+            "status": "success",
+            "supplier": po_doc.supplier,
+            "items": items_data,
+            "total_items": len(items_data)
+        }
+        
+    except Exception as e:
+        frappe.logger().error(f"Error in fetch_items_from_purchase_order_for_form: {str(e)}")
+        return {"status": "error", "message": str(e)} 
