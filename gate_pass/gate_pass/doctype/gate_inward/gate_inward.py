@@ -76,6 +76,101 @@ class GateInward(Document):
                 }) 
 
 @frappe.whitelist()
+def fetch_items_from_po_for_form(gate_inward, purchase_order):
+    """Fetch items from Purchase Order for form (without saving)"""
+    if not purchase_order:
+        return {"status": "error", "message": "Purchase Order is required"}
+    
+    try:
+        po_doc = frappe.get_doc("Purchase Order", purchase_order)
+        
+        # Get the Gate Inward document
+        if gate_inward and frappe.db.exists("Gate Inward", gate_inward):
+            gi_doc = frappe.get_doc("Gate Inward", gate_inward)
+        else:
+            # Create a new document instance (not saved)
+            gi_doc = frappe.new_doc("Gate Inward")
+            gi_doc.name = gate_inward
+        
+        # Update fields
+        gi_doc.supplier = po_doc.supplier
+        gi_doc.source_document_type = "Purchase Order"
+        gi_doc.source_document = purchase_order
+        
+        # Clear existing items and add new ones
+        items_data = []
+        for item in po_doc.items:
+            items_data.append({
+                "item_code": item.item_code,
+                "item_name": item.item_name,
+                "description": item.description,
+                "qty": item.qty,
+                "uom": item.uom,
+                "warehouse": item.warehouse,
+                "received_qty": 0,
+                "pending_qty": item.qty
+            })
+        
+        return {
+            "status": "success",
+            "supplier": po_doc.supplier,
+            "source_document_type": "Purchase Order",
+            "source_document": purchase_order,
+            "items": items_data
+        }
+        
+    except Exception as e:
+        frappe.log_error(f"Error fetching items from PO: {str(e)}")
+        return {"status": "error", "message": str(e)}
+
+@frappe.whitelist()
+def fetch_items_from_stock_entry_for_form(gate_inward, stock_entry):
+    """Fetch items from Stock Entry for form (without saving)"""
+    if not stock_entry:
+        return {"status": "error", "message": "Stock Entry is required"}
+    
+    try:
+        se_doc = frappe.get_doc("Stock Entry", stock_entry)
+        
+        # Get the Gate Inward document
+        if gate_inward and frappe.db.exists("Gate Inward", gate_inward):
+            gi_doc = frappe.get_doc("Gate Inward", gate_inward)
+        else:
+            # Create a new document instance (not saved)
+            gi_doc = frappe.new_doc("Gate Inward")
+            gi_doc.name = gate_inward
+        
+        # Update fields
+        gi_doc.source_document_type = "Stock Entry"
+        gi_doc.source_document = stock_entry
+        
+        # Clear existing items and add new ones
+        items_data = []
+        for item in se_doc.items:
+            if item.t_warehouse:  # Only items going to a warehouse (inward)
+                items_data.append({
+                    "item_code": item.item_code,
+                    "item_name": item.item_name,
+                    "description": item.description,
+                    "qty": item.qty,
+                    "uom": item.uom,
+                    "warehouse": item.t_warehouse,
+                    "received_qty": 0,
+                    "pending_qty": item.qty
+                })
+        
+        return {
+            "status": "success",
+            "source_document_type": "Stock Entry",
+            "source_document": stock_entry,
+            "items": items_data
+        }
+        
+    except Exception as e:
+        frappe.log_error(f"Error fetching items from Stock Entry: {str(e)}")
+        return {"status": "error", "message": str(e)}
+
+@frappe.whitelist()
 def get_gate_inwards_for_purchase_receipt(doctype, txt, searchfield, start, page_len, filters):
     """Custom query method for Gate Inward selection in Purchase Receipt"""
     try:

@@ -142,24 +142,24 @@ doctype_js = {
 # ---------------
 # Hook on document methods and events
 
-doc_events = {
-	"Purchase Order": {
-		"on_submit": "gate_pass.gate_pass_events.create_gate_inward_from_po",
-		"on_cancel": "gate_pass.gate_pass_events.cancel_gate_inward_from_po"
-	},
-	"Delivery Note": {
-		"on_submit": "gate_pass.gate_pass_events.create_gate_outward_from_dn",
-		"on_cancel": "gate_pass.gate_pass_events.cancel_gate_outward_from_dn"
-	},
-	"Stock Entry": {
-		"on_submit": "gate_pass.gate_pass_events.create_gate_pass_from_stock_entry",
-		"on_cancel": "gate_pass.gate_pass_events.cancel_gate_pass_from_stock_entry"
-	},
-	"Purchase Receipt": {
-		"on_submit": "gate_pass.gate_pass_events.update_gate_inward_from_pr",
-		"on_cancel": "gate_pass.gate_pass_events.revert_gate_inward_from_pr"
-	}
-}
+# doc_events = {
+# 	"Purchase Order": {
+# 		"on_submit": "gate_pass.gate_pass_events.create_gate_inward_from_po",
+# 		"on_cancel": "gate_pass.gate_pass_events.cancel_gate_inward_from_po"
+# 	},
+# 	"Delivery Note": {
+# 		"on_submit": "gate_pass.gate_pass_events.create_gate_outward_from_dn",
+# 		"on_cancel": "gate_pass.gate_pass_events.cancel_gate_outward_from_dn"
+# 	},
+# 	"Stock Entry": {
+# 		"on_submit": "gate_pass.gate_pass_events.create_gate_pass_from_stock_entry",
+# 		"on_cancel": "gate_pass.gate_pass_events.cancel_gate_pass_from_stock_entry"
+# 	},
+# 	"Purchase Receipt": {
+# 		"on_submit": "gate_pass.gate_pass_events.update_gate_inward_from_pr",
+# 		"on_cancel": "gate_pass.gate_pass_events.revert_gate_inward_from_pr"
+# 	}
+# }
 
 # Scheduled Tasks
 # ---------------
