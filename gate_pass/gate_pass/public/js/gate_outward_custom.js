@@ -66,7 +66,7 @@ function get_items_from_dn(frm) {
             if (delivery_note) {
                 // First save the document if it's new
                 if (frm.doc.__islocal) {
-                    frm.save('Update', function() {
+                    frm.save('Save', function() {
                         fetch_items_from_dn(frm, delivery_note);
                     });
                 } else {
@@ -112,7 +112,7 @@ function get_items_from_stock_entry(frm) {
             if (stock_entry) {
                 // First save the document if it's new
                 if (frm.doc.__islocal) {
-                    frm.save('Update', function() {
+                    frm.save('Save', function() {
                         fetch_items_from_stock_entry(frm, stock_entry);
                     });
                 } else {
@@ -134,7 +134,7 @@ function fetch_items_from_dn(frm, delivery_note) {
         },
         callback: function(r) {
             if (r.message) {
-                frm.reload_doc();
+                frm.refresh();
                 frappe.msgprint(__('Items fetched from Delivery Note successfully'));
             }
         },
@@ -154,7 +154,7 @@ function fetch_items_from_stock_entry(frm, stock_entry) {
         },
         callback: function(r) {
             if (r.message) {
-                frm.reload_doc();
+                frm.refresh();
                 frappe.msgprint(__('Items fetched from Stock Entry successfully'));
             }
         },
