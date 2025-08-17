@@ -71,14 +71,12 @@ function get_items_from_po(frm) {
         primary_action: function() {
             let purchase_order = d.get_value('purchase_order');
             if (purchase_order) {
-                // First save the document if it's new
-                if (frm.doc.__islocal) {
-                    frm.save('Update', function() {
-                        fetch_items_from_po(frm, purchase_order);
-                    });
-                } else {
-                    fetch_items_from_po(frm, purchase_order);
+                // Check if document name is entered
+                if (!frm.doc.name) {
+                    frappe.msgprint(__('Please enter the Gate Inward name first before fetching items.'));
+                    return;
                 }
+                fetch_items_from_po(frm, purchase_order);
             }
             d.hide();
         }
@@ -117,14 +115,12 @@ function get_items_from_stock_entry(frm) {
         primary_action: function() {
             let stock_entry = d.get_value('stock_entry');
             if (stock_entry) {
-                // First save the document if it's new
-                if (frm.doc.__islocal) {
-                    frm.save('Update', function() {
-                        fetch_items_from_stock_entry(frm, stock_entry);
-                    });
-                } else {
-                    fetch_items_from_stock_entry(frm, stock_entry);
+                // Check if document name is entered
+                if (!frm.doc.name) {
+                    frappe.msgprint(__('Please enter the Gate Inward name first before fetching items.'));
+                    return;
                 }
+                fetch_items_from_stock_entry(frm, stock_entry);
             }
             d.hide();
         }
@@ -134,15 +130,40 @@ function get_items_from_stock_entry(frm) {
 
 function fetch_items_from_po(frm, purchase_order) {
     frappe.call({
-        method: 'gate_pass.gate_pass_events.fetch_items_from_po',
+        method: 'gate_pass.gate_pass.doctype.gate_inward.gate_inward.fetch_items_from_po_for_form',
         args: {
             'gate_inward': frm.doc.name,
             'purchase_order': purchase_order
         },
         callback: function(r) {
-            if (r.message) {
-                frm.reload_doc();
+            if (r.message && r.message.status === 'success') {
+                // Update form fields
+                frm.set_value('supplier', r.message.supplier);
+                frm.set_value('source_document_type', r.message.source_document_type);
+                frm.set_value('source_document', r.message.source_document);
+                
+                // Clear existing items
+                frm.clear_table('items');
+                
+                // Add new items
+                if (r.message.items && r.message.items.length > 0) {
+                    r.message.items.forEach(function(item) {
+                        let row = frm.add_child('items');
+                        row.item_code = item.item_code;
+                        row.item_name = item.item_name;
+                        row.description = item.description;
+                        row.qty = item.qty;
+                        row.uom = item.uom;
+                        row.warehouse = item.warehouse;
+                        row.received_qty = item.received_qty;
+                        row.pending_qty = item.pending_qty;
+                    });
+                }
+                
+                frm.refresh_field('items');
                 frappe.msgprint(__('Items fetched from Purchase Order successfully'));
+            } else {
+                frappe.msgprint(__('Error: {0}').format(r.message ? r.message.message : 'Unknown error'));
             }
         },
         error: function(r) {
@@ -154,15 +175,39 @@ function fetch_items_from_po(frm, purchase_order) {
 
 function fetch_items_from_stock_entry(frm, stock_entry) {
     frappe.call({
-        method: 'gate_pass.gate_pass_events.fetch_items_from_stock_entry',
+        method: 'gate_pass.gate_pass.doctype.gate_inward.gate_inward.fetch_items_from_stock_entry_for_form',
         args: {
             'gate_inward': frm.doc.name,
             'stock_entry': stock_entry
         },
         callback: function(r) {
-            if (r.message) {
-                frm.reload_doc();
+            if (r.message && r.message.status === 'success') {
+                // Update form fields
+                frm.set_value('source_document_type', r.message.source_document_type);
+                frm.set_value('source_document', r.message.source_document);
+                
+                // Clear existing items
+                frm.clear_table('items');
+                
+                // Add new items
+                if (r.message.items && r.message.items.length > 0) {
+                    r.message.items.forEach(function(item) {
+                        let row = frm.add_child('items');
+                        row.item_code = item.item_code;
+                        row.item_name = item.item_name;
+                        row.description = item.description;
+                        row.qty = item.qty;
+                        row.uom = item.uom;
+                        row.warehouse = item.warehouse;
+                        row.received_qty = item.received_qty;
+                        row.pending_qty = item.pending_qty;
+                    });
+                }
+                
+                frm.refresh_field('items');
                 frappe.msgprint(__('Items fetched from Stock Entry successfully'));
+            } else {
+                frappe.msgprint(__('Error: {0}').format(r.message ? r.message.message : 'Unknown error'));
             }
         },
         error: function(r) {
