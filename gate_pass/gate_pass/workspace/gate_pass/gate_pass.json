@@ -1,0 +1,45 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"MXmimA0GsJ\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Master</b></span>\",\"col\":12}},{\"id\":\"54ijBf3aY-\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Customer\",\"col\":4}},{\"id\":\"e2l5H0M_J2\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Supplier\",\"col\":4}},{\"id\":\"-PHqnRIRy4\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Gate Pass</b></span>\",\"col\":12}},{\"id\":\"kQz5JEX6yA\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Outward Gate Pass\",\"col\":4}},{\"id\":\"T1KVtc4lq6\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Courier Gate Pass\",\"col\":4}}]",
+ "creation": "2024-05-27 15:34:45.224508",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "month-view",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "Gate Pass",
+ "links": [],
+ "modified": "2024-07-23 11:30:10.856224",
+ "modified_by": "Administrator",
+ "module": "Gate Pass",
+ "name": "Gate Pass",
+ "number_cards": [
+  {
+   "label": "Outward Gate Pass",
+   "number_card_name": "Outward Gate Pass"
+  },
+  {
+   "label": "Customer",
+   "number_card_name": "Customer"
+  },
+  {
+   "label": "Courier Gate Pass",
+   "number_card_name": "Courier Gate Pass"
+  },
+  {
+   "label": "Supplier",
+   "number_card_name": "Supplier"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 39.0,
+ "shortcuts": [],
+ "title": "Gate Pass"
+}

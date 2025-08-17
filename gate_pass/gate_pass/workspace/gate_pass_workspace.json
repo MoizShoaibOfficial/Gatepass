@@ -1,0 +1,101 @@
+{
+ "charts": [
+  {
+   "chart": "Gate Inward Status",
+   "width": "Half"
+  },
+  {
+   "chart": "Gate Outward Status",
+   "width": "Half"
+  }
+ ],
+ "creation": "2025-01-27 10:00:00.000000",
+ "dashboard": "Gate Pass Dashboard",
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "extends": "Gate Pass",
+ "extends_another_page": 0,
+ "for_user": "",
+ "hide_custom": 0,
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "label": "Gate Pass",
+ "links": [
+  {
+   "dependencies": [],
+   "hidden": 0,
+   "label": "Gate Inward",
+   "link_to": "Gate Inward",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card"
+  },
+  {
+   "dependencies": [],
+   "hidden": 0,
+   "label": "Gate Outward",
+   "link_to": "Gate Outward",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card"
+  },
+  {
+   "dependencies": [],
+   "hidden": 0,
+   "label": "Purchase Order",
+   "link_to": "Purchase Order",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card"
+  },
+  {
+   "dependencies": [],
+   "hidden": 0,
+   "label": "Delivery Note",
+   "link_to": "Delivery Note",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card"
+  },
+  {
+   "dependencies": [],
+   "hidden": 0,
+   "label": "Stock Entry",
+   "link_to": "Stock Entry",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card"
+  }
+ ],
+ "modified": "2025-01-27 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Gate Pass",
+ "name": "Gate Pass",
+ "owner": "Administrator",
+ "pin_to_bottom": 0,
+ "pin_to_top": 0,
+ "shortcuts": [
+  {
+   "color": "#98d85b",
+   "doc_view": "",
+   "format": "Format",
+   "icon": "octicon octicon-sign-in",
+   "label": "New Gate Inward",
+   "link_to": "Gate Inward",
+   "link_type": "DocType",
+   "type": "DocumentType"
+  },
+  {
+   "color": "#ff5858",
+   "doc_view": "",
+   "format": "Format",
+   "icon": "octicon octicon-sign-out",
+   "label": "New Gate Outward",
+   "link_to": "Gate Outward",
+   "link_type": "DocType",
+   "type": "DocumentType"
+  }
+ ],
+ "shortcuts_label": "Quick Actions"
+} 

@@ -1,0 +1,50 @@
+{
+ "cards": [
+  {
+   "chart": "Gate Inward Status",
+   "creation": "2025-01-27 10:00:00.000000",
+   "dashboard": "Gate Pass Dashboard",
+   "docstatus": 0,
+   "doctype": "Dashboard Chart",
+   "idx": 1,
+   "is_default": 1,
+   "is_public": 1,
+   "modified": "2025-01-27 10:00:00.000000",
+   "modified_by": "Administrator",
+   "module": "Gate Pass",
+   "name": "Gate Inward Status",
+   "owner": "Administrator",
+   "report": "Gate Inward Status",
+   "type": "Donut"
+  },
+  {
+   "chart": "Gate Outward Status",
+   "creation": "2025-01-27 10:00:00.000000",
+   "dashboard": "Gate Pass Dashboard",
+   "docstatus": 0,
+   "doctype": "Dashboard Chart",
+   "idx": 2,
+   "is_default": 1,
+   "is_public": 1,
+   "modified": "2025-01-27 10:00:00.000000",
+   "modified_by": "Administrator",
+   "module": "Gate Pass",
+   "name": "Gate Outward Status",
+   "owner": "Administrator",
+   "report": "Gate Outward Status",
+   "type": "Donut"
+  }
+ ],
+ "creation": "2025-01-27 10:00:00.000000",
+ "dashboard_name": "Gate Pass Dashboard",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2025-01-27 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Gate Pass",
+ "name": "Gate Pass Dashboard",
+ "owner": "Administrator"
+} 

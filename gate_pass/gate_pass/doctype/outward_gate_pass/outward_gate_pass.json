@@ -1,0 +1,465 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2024-05-25 00:39:04.985395",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "ogp_type",
+  "inventory",
+  "is_non_inventory",
+  "stock_entry_voucher",
+  "column_break_fpv1b",
+  "creation_date",
+  "column_break_rl0fu",
+  "type",
+  "column_break_fxnwa",
+  "returnable_date",
+  "approved_date",
+  "section_break_rbika",
+  "courier_name",
+  "column_break_3pwr9",
+  "courier_by",
+  "column_break_zxdol",
+  "by_hand_name",
+  "unit",
+  "section_break_773ua",
+  "out_to",
+  "column_break_023y6",
+  "customer",
+  "supplier",
+  "local",
+  "column_break_o90o3",
+  "by_hand",
+  "airway_bill_no",
+  "column_break_kc6na",
+  "issue_warehouse",
+  "inventory_items_section",
+  "inventory_gate_pass",
+  "non_inventory_items_section",
+  "non_inventory",
+  "section_break_mgsof",
+  "document_from",
+  "column_break_r3adk",
+  "courier_gate_pass",
+  "section_break_ctla",
+  "document",
+  "column_break_bhnl",
+  "voucher",
+  "vehicle_details_section",
+  "vehicle_no",
+  "column_break_tzhh",
+  "driver_name",
+  "column_break_psxb",
+  "driver_contact",
+  "additional_instruction_tab",
+  "additional_instruction",
+  "section_break_xf1h1",
+  "owner1",
+  "prepared_by",
+  "column_break_rtl7t",
+  "approved_user",
+  "approved_by",
+  "column_break_hpjyd",
+  "returned_by",
+  "received_by",
+  "naming_series",
+  "amended_from",
+  "stock_entry"
+ ],
+ "fields": [
+  {
+   "fieldname": "non_inventory",
+   "fieldtype": "Table",
+   "label": "Non Inventory OGP",
+   "options": "Non Inventory OGP"
+  },
+  {
+   "fieldname": "ogp_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "OGP Type",
+   "options": "\nInventory\nNon-Inventory",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "inventory",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Inventory"
+  },
+  {
+   "fieldname": "column_break_fpv1b",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Now",
+   "fieldname": "creation_date",
+   "fieldtype": "Date",
+   "label": "Creation Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_rl0fu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Type",
+   "options": "\nNon-Returnable\nReturnable",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_fxnwa",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.type == \"Returnable\"",
+   "fieldname": "returnable_date",
+   "fieldtype": "Date",
+   "label": "Returnable Date"
+  },
+  {
+   "fieldname": "approved_date",
+   "fieldtype": "Date",
+   "label": "Approved Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_rbika",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "courier_name",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Courier Name",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "column_break_3pwr9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "courier_by",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Courier By",
+   "options": "Courier By"
+  },
+  {
+   "fieldname": "column_break_zxdol",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "by_hand_name",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "By Hand Name"
+  },
+  {
+   "fieldname": "unit",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Unit",
+   "options": "Branch"
+  },
+  {
+   "fieldname": "section_break_773ua",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_023y6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.out_to == \"Supplier\"",
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier"
+  },
+  {
+   "depends_on": "eval:doc.out_to == \"Local\"",
+   "fieldname": "local",
+   "fieldtype": "Data",
+   "label": "Local"
+  },
+  {
+   "fieldname": "column_break_o90o3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "by_hand",
+   "fieldtype": "Link",
+   "label": "By Hand",
+   "options": "Hand By Name"
+  },
+  {
+   "fieldname": "airway_bill_no",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Airway Bill No"
+  },
+  {
+   "fieldname": "column_break_kc6na",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.ogp_type == \"Inventory\" && doc.type == \"Non-Returnable\"\n",
+   "fieldname": "issue_warehouse",
+   "fieldtype": "Link",
+   "label": "Issue Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "depends_on": "eval:doc.ogp_type ==\"Inventory\"",
+   "fieldname": "inventory_items_section",
+   "fieldtype": "Section Break",
+   "label": "Inventory Items"
+  },
+  {
+   "depends_on": "eval:doc.ogp_type ==\"Non-Inventory\"",
+   "fieldname": "non_inventory_items_section",
+   "fieldtype": "Section Break",
+   "label": "Non Inventory Items"
+  },
+  {
+   "fieldname": "section_break_mgsof",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "document_from",
+   "fieldtype": "Select",
+   "label": "Document From",
+   "options": "Outward Gate Pass\nCourier Gate Pass",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_r3adk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "courier_gate_pass",
+   "fieldtype": "Data",
+   "label": "Courier Gate Pass",
+   "read_only": 1
+  },
+  {
+   "fieldname": "additional_instruction_tab",
+   "fieldtype": "Tab Break",
+   "label": "Additional Instruction"
+  },
+  {
+   "fieldname": "additional_instruction",
+   "fieldtype": "Text Editor",
+   "label": "Additional Instruction"
+  },
+  {
+   "fieldname": "section_break_xf1h1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "owner1",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Owner",
+   "options": "User"
+  },
+  {
+   "fieldname": "prepared_by",
+   "fieldtype": "Link",
+   "label": "Prepared By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_rtl7t",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "approved_user",
+   "fieldtype": "Link",
+   "label": "Modified By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "approved_by",
+   "fieldtype": "Data",
+   "label": "Approved By",
+   "read_only": 1
+  },
+  {
+   "fieldname": "returned_by",
+   "fieldtype": "Link",
+   "label": "Returned By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "received_by",
+   "fieldtype": "Data",
+   "label": "Received By",
+   "read_only": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": "OGP-.MM.-.YY.-"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Outward Gate Pass",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_hpjyd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "stock_entry",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Stock Entry",
+   "options": "Stock Entry"
+  },
+  {
+   "fieldname": "out_to",
+   "fieldtype": "Select",
+   "label": "Deliver To",
+   "options": "Customer\nSupplier\nLocal"
+  },
+  {
+   "fieldname": "stock_entry_voucher",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Stock Entry Voucher"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_non_inventory",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Non Inventory"
+  },
+  {
+   "depends_on": "eval:doc.out_to == \"Customer\"",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "depends_on": "eval:doc.ogp_type ==\"Inventory\"",
+   "fieldname": "inventory_gate_pass",
+   "fieldtype": "Table",
+   "label": "Inventory Gate Pass",
+   "options": "Inventory Gate Pass"
+  },
+  {
+   "fieldname": "section_break_ctla",
+   "fieldtype": "Section Break",
+   "label": "Document Details"
+  },
+  {
+   "fieldname": "document",
+   "fieldtype": "Link",
+   "label": "Document",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "voucher",
+   "fieldtype": "Dynamic Link",
+   "label": "Voucher",
+   "options": "document"
+  },
+  {
+   "fieldname": "column_break_bhnl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vehicle_details_section",
+   "fieldtype": "Section Break",
+   "label": "Vehicle Details"
+  },
+  {
+   "fieldname": "vehicle_no",
+   "fieldtype": "Data",
+   "label": "Vehicle No"
+  },
+  {
+   "fieldname": "column_break_tzhh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "driver_name",
+   "fieldtype": "Data",
+   "label": "Driver Name"
+  },
+  {
+   "fieldname": "column_break_psxb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "driver_contact",
+   "fieldtype": "Data",
+   "label": "Driver Contact"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [
+  {
+   "group": "Customer",
+   "link_doctype": "Customer",
+   "link_fieldname": "customer_name"
+  },
+  {
+   "group": "Supplier",
+   "link_doctype": "Supplier",
+   "link_fieldname": "supplier_name"
+  }
+ ],
+ "modified": "2025-06-16 15:59:53.703019",
+ "modified_by": "shoaibmohtashim973@gmail.com",
+ "module": "Gate Pass",
+ "name": "Outward Gate Pass",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
+}

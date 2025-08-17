@@ -1,0 +1,479 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2024-05-25 00:23:28.257427",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "contact_details_tab",
+  "section_break_bpe9t",
+  "creation_date",
+  "column_break_xge8g",
+  "out_to",
+  "section_break_97ief",
+  "customer",
+  "supplier",
+  "local",
+  "contact_link",
+  "contact_person_name",
+  "mobile_no",
+  "link_address",
+  "address",
+  "column_break_zwu10",
+  "invoice_from",
+  "ntn_no",
+  "contact",
+  "mobile",
+  "from_address",
+  "shipping_details_tab",
+  "shipping_details_section",
+  "courier_supplier",
+  "courier_service",
+  "column_break_lb1nl",
+  "trip_type",
+  "airway_bill_no",
+  "column_break_fteyt",
+  "type_of_samples",
+  "mode_of_transport",
+  "packaging_details_tab",
+  "section_break_otwod",
+  "no_of_packages",
+  "gross_wt",
+  "net_wt",
+  "column_break_2j0wi",
+  "dimensions",
+  "total_weight",
+  "invoice_details_tab",
+  "invoice_details_section",
+  "column_break_wyrv6",
+  "invoice_no",
+  "invoice_date",
+  "goods_and_description_section",
+  "courier_gate_pass_ct",
+  "section_break_hn5yq",
+  "total_qty",
+  "column_break_pklqi",
+  "currency",
+  "total_amount",
+  "sample_details_tab",
+  "section_break_v4zsd",
+  "sample_detail",
+  "section_break_zaats",
+  "owner1",
+  "prepared_by",
+  "column_break_ihvlg",
+  "modified_by1",
+  "approved_by",
+  "column_break_vd2yr",
+  "naming_series",
+  "bank_information_tab",
+  "courier_bank_information",
+  "letter_tab",
+  "letter",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "contact_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Contact Details"
+  },
+  {
+   "fieldname": "section_break_bpe9t",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "Today",
+   "fieldname": "creation_date",
+   "fieldtype": "Date",
+   "label": "Creation Date",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_xge8g",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_97ief",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.out_to == \"Customer\"",
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer"
+  },
+  {
+   "depends_on": "eval:doc.out_to == \"Supplier\"",
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier"
+  },
+  {
+   "depends_on": "eval:doc.out_to == \"Local\"",
+   "fieldname": "local",
+   "fieldtype": "Data",
+   "label": "Local"
+  },
+  {
+   "fieldname": "contact_link",
+   "fieldtype": "Link",
+   "label": "Contact Link",
+   "options": "Contact"
+  },
+  {
+   "fetch_from": "contact_link.first_name",
+   "fieldname": "contact_person_name",
+   "fieldtype": "Data",
+   "label": "Contact Person Name"
+  },
+  {
+   "fetch_from": "contact_link.mobile_no",
+   "fieldname": "mobile_no",
+   "fieldtype": "Data",
+   "label": "Mobile No"
+  },
+  {
+   "depends_on": "eval:doc.out_to != \"Local\"",
+   "fieldname": "link_address",
+   "fieldtype": "Link",
+   "label": "Address",
+   "options": "Address"
+  },
+  {
+   "fetch_from": "link_address.full_address",
+   "fieldname": "address",
+   "fieldtype": "Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "column_break_zwu10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "S.A.H ENTERPRISE INC.",
+   "fieldname": "invoice_from",
+   "fieldtype": "Link",
+   "label": "Invoice From",
+   "options": "Invoice From"
+  },
+  {
+   "fetch_from": "invoice_from.ntn",
+   "fieldname": "ntn_no",
+   "fieldtype": "Data",
+   "label": "NTN No"
+  },
+  {
+   "fetch_from": "invoice_from.address",
+   "fieldname": "from_address",
+   "fieldtype": "Data",
+   "label": "From Address"
+  },
+  {
+   "fieldname": "shipping_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Shipping Details"
+  },
+  {
+   "fieldname": "shipping_details_section",
+   "fieldtype": "Section Break",
+   "label": "Shipping Details"
+  },
+  {
+   "fieldname": "courier_supplier",
+   "fieldtype": "Link",
+   "label": "Courier Supplier",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "courier_service",
+   "fieldtype": "Link",
+   "label": "Courier Service",
+   "options": "Courier Service"
+  },
+  {
+   "fieldname": "column_break_lb1nl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "trip_type",
+   "fieldtype": "Select",
+   "label": "Trip Type",
+   "options": "\nLocal\nExport"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "airway_bill_no",
+   "fieldtype": "Data",
+   "label": "Airway Bill No"
+  },
+  {
+   "fieldname": "column_break_fteyt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "type_of_samples",
+   "fieldtype": "Link",
+   "label": "Type of Samples",
+   "options": "Type of Samples"
+  },
+  {
+   "fieldname": "packaging_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Packaging Details"
+  },
+  {
+   "fieldname": "section_break_otwod",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "no_of_packages",
+   "fieldtype": "Int",
+   "label": "No of Packages"
+  },
+  {
+   "fieldname": "column_break_2j0wi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "dimensions",
+   "fieldtype": "Table",
+   "label": "Dimensions",
+   "options": "Dimensions"
+  },
+  {
+   "fieldname": "invoice_details_section",
+   "fieldtype": "Section Break",
+   "label": "Invoice Details"
+  },
+  {
+   "fieldname": "invoice_no",
+   "fieldtype": "Data",
+   "label": "Invoice No"
+  },
+  {
+   "fieldname": "column_break_wyrv6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "invoice_date",
+   "fieldtype": "Date",
+   "label": "Invoice Date"
+  },
+  {
+   "fieldname": "goods_and_description_section",
+   "fieldtype": "Tab Break",
+   "label": "Goods Description"
+  },
+  {
+   "fieldname": "section_break_hn5yq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_qty",
+   "fieldtype": "Float",
+   "label": "Total Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_pklqi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount",
+   "options": "currency",
+   "precision": "0",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sample_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Sample Details"
+  },
+  {
+   "fieldname": "section_break_v4zsd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "owner1",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Owner",
+   "options": "User"
+  },
+  {
+   "fetch_from": "owner.full_name",
+   "fieldname": "prepared_by",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Prepared By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ihvlg",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "modified_by1",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Modified By",
+   "options": "User"
+  },
+  {
+   "fetch_from": "modified_by1.full_name",
+   "fieldname": "approved_by",
+   "fieldtype": "Data",
+   "label": "Approved By",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_vd2yr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Naming Series",
+   "options": ".####./.MM./.YYYY"
+  },
+  {
+   "default": "USD",
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Currency",
+   "options": "Currency"
+  },
+  {
+   "fieldname": "bank_information_tab",
+   "fieldtype": "Tab Break",
+   "label": "Bank Information"
+  },
+  {
+   "fieldname": "courier_bank_information",
+   "fieldtype": "Table",
+   "label": "Courier Bank Information",
+   "options": "Courier Bank Information"
+  },
+  {
+   "fieldname": "letter_tab",
+   "fieldtype": "Tab Break",
+   "label": "Letter"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "letter",
+   "fieldtype": "Text Editor",
+   "label": "Letter"
+  },
+  {
+   "fieldname": "courier_gate_pass_ct",
+   "fieldtype": "Table",
+   "label": "Courier Gate Pass CT",
+   "options": "Courier Gate Pass CT"
+  },
+  {
+   "fieldname": "out_to",
+   "fieldtype": "Select",
+   "label": "Deliver To",
+   "options": "Customer\nSupplier\nLocal"
+  },
+  {
+   "fieldname": "sample_detail",
+   "fieldtype": "Text Editor",
+   "label": "Sample Detail"
+  },
+  {
+   "fieldname": "total_weight",
+   "fieldtype": "Float",
+   "label": "Dimension Total Weight"
+  },
+  {
+   "fieldname": "invoice_details_tab",
+   "fieldtype": "Tab Break",
+   "label": "Invoice Details"
+  },
+  {
+   "fieldname": "section_break_zaats",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "gross_wt",
+   "fieldtype": "Data",
+   "label": "Physical Gross Weight"
+  },
+  {
+   "fieldname": "net_wt",
+   "fieldtype": "Data",
+   "label": "Physical Net Weight"
+  },
+  {
+   "fieldname": "mode_of_transport",
+   "fieldtype": "Link",
+   "label": "By Hand",
+   "options": "Hand By Name"
+  },
+  {
+   "fieldname": "contact",
+   "fieldtype": "Link",
+   "label": "Contact Person",
+   "options": "Contact"
+  },
+  {
+   "fetch_from": "contact.mobile_no",
+   "fieldname": "mobile",
+   "fieldtype": "Data",
+   "label": "Mobile"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Courier Gate Pass",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-07-11 10:33:36.686428",
+ "modified_by": "Administrator",
+ "module": "Gate Pass",
+ "name": "Courier Gate Pass",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "track_seen": 1,
+ "track_views": 1
+}
