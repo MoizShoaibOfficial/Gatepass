@@ -1226,4 +1226,105 @@ def fetch_items_from_purchase_order_for_form(purchase_receipt_name, purchase_ord
         
     except Exception as e:
         frappe.logger().error(f"Error in fetch_items_from_purchase_order_for_form: {str(e)}")
+        return {"status": "error", "message": str(e)}
+
+@frappe.whitelist()
+def fetch_items_from_supplier_quotation_for_form(purchase_receipt_name, supplier_quotation):
+    """Fetch items from Supplier Quotation for form (without requiring document to exist in DB)"""
+    try:
+        frappe.logger().info(f"Starting fetch_items_from_supplier_quotation_for_form: PR={purchase_receipt_name}, SQ={supplier_quotation}")
+        
+        sq_doc = frappe.get_doc("Supplier Quotation", supplier_quotation)
+        
+        # Validate that Supplier Quotation is submitted
+        if sq_doc.docstatus != 1:
+            return {"status": "error", "message": f"Supplier Quotation {supplier_quotation} is not submitted"}
+        
+        # Prepare items data
+        items_data = []
+        for sq_item in sq_doc.items:
+            # Get item details
+            try:
+                item_doc = frappe.get_doc("Item", sq_item.item_code)
+            except Exception as e:
+                continue  # Skip this item if not found
+            
+            items_data.append({
+                "item_code": sq_item.item_code,
+                "item_name": sq_item.item_name or item_doc.item_name,
+                "description": sq_item.description or "",
+                "qty": sq_item.qty,
+                "received_qty": sq_item.qty,
+                "uom": sq_item.uom or item_doc.stock_uom,
+                "stock_uom": item_doc.stock_uom,
+                "conversion_factor": sq_item.conversion_factor or 1.0,
+                "warehouse": sq_item.warehouse,
+                "rate": sq_item.rate or 0,
+                "base_rate": sq_item.rate or 0,
+                "amount": (sq_item.qty or 0) * (sq_item.rate or 0),
+                "base_amount": (sq_item.qty or 0) * (sq_item.rate or 0),
+                "supplier_quotation": supplier_quotation,
+                "supplier_quotation_item": sq_item.name
+            })
+        
+        return {
+            "status": "success",
+            "supplier": sq_doc.supplier,
+            "items": items_data,
+            "total_items": len(items_data)
+        }
+        
+    except Exception as e:
+        frappe.logger().error(f"Error in fetch_items_from_supplier_quotation_for_form: {str(e)}")
+        return {"status": "error", "message": str(e)}
+
+@frappe.whitelist()
+def fetch_items_from_gate_inward_for_form(purchase_receipt_name, gate_inward):
+    """Fetch items from Gate Inward for form (without requiring document to exist in DB)"""
+    try:
+        frappe.logger().info(f"Starting fetch_items_from_gate_inward_for_form: PR={purchase_receipt_name}, GI={gate_inward}")
+        
+        gi_doc = frappe.get_doc("Gate Inward", gate_inward)
+        
+        # Validate that Gate Inward is submitted
+        if gi_doc.docstatus != 1:
+            return {"status": "error", "message": f"Gate Inward {gate_inward} is not submitted"}
+        
+        # Prepare items data
+        items_data = []
+        for gi_item in gi_doc.items:
+            if gi_item.pending_qty > 0:  # Only add items with pending quantity
+                # Get item details
+                try:
+                    item_doc = frappe.get_doc("Item", gi_item.item_code)
+                except Exception as e:
+                    continue  # Skip this item if not found
+                
+                items_data.append({
+                    "item_code": gi_item.item_code,
+                    "item_name": gi_item.item_name or item_doc.item_name,
+                    "description": gi_item.description or "",
+                    "qty": gi_item.pending_qty,
+                    "received_qty": gi_item.pending_qty,
+                    "uom": gi_item.uom or item_doc.stock_uom,
+                    "stock_uom": item_doc.stock_uom,
+                    "conversion_factor": 1.0,
+                    "warehouse": gi_item.warehouse,
+                    "rate": 0,
+                    "base_rate": 0,
+                    "amount": 0,
+                    "base_amount": 0,
+                    "source_document_type": "Gate Inward",
+                    "source_document": gate_inward
+                })
+        
+        return {
+            "status": "success",
+            "supplier": gi_doc.supplier,
+            "items": items_data,
+            "total_items": len(items_data)
+        }
+        
+    except Exception as e:
+        frappe.logger().error(f"Error in fetch_items_from_gate_inward_for_form: {str(e)}")
         return {"status": "error", "message": str(e)} 

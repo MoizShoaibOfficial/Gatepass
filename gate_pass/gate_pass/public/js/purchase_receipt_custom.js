@@ -143,20 +143,66 @@ function fetch_items_from_source(frm, source, source_name, d) {
     console.log('Form name:', frm.doc.name);
     
     if (source === 'Gate Inward') {
-        // Handle Gate Inward
+        // Handle Gate Inward - use our new method that works with form data
+        console.log('Fetching items from Gate Inward:', source_name);
+        console.log('Purchase Receipt:', frm.doc.name);
+        
         frappe.call({
-            method: 'gate_pass.gate_pass_events.fetch_items_from_gate_inward_via_get_items',
+            method: 'gate_pass.gate_pass_events.fetch_items_from_gate_inward_for_form',
             args: {
-                'purchase_receipt': frm.doc.name,
+                'purchase_receipt_name': frm.doc.name,
                 'gate_inward': source_name
             },
             callback: function(r) {
-                if (r.message) {
-                    frm.reload_doc();
-                    frappe.msgprint(__('Items fetched from Gate Inward successfully'));
+                console.log('Fetch Gate Inward items response:', r);
+                
+                if (r.message && r.message.status === 'success') {
+                    console.log('Gate Inward items fetched successfully, adding to form...');
+                    
+                    // Set supplier if not already set
+                    if (r.message.supplier && !frm.doc.supplier) {
+                        frm.set_value('supplier', r.message.supplier);
+                    }
+                    
+                    // Clear existing items
+                    frm.clear_table('items');
+                    
+                    // Add new items to the form
+                    if (r.message.items && r.message.items.length > 0) {
+                        r.message.items.forEach(function(item) {
+                            let row = frm.add_child('items');
+                            row.item_code = item.item_code;
+                            row.item_name = item.item_name;
+                            row.description = item.description;
+                            row.qty = item.qty;
+                            row.received_qty = item.received_qty;
+                            row.uom = item.uom;
+                            row.stock_uom = item.stock_uom;
+                            row.conversion_factor = item.conversion_factor;
+                            row.warehouse = item.warehouse;
+                            row.rate = item.rate;
+                            row.base_rate = item.base_rate;
+                            row.amount = item.amount;
+                            row.base_amount = item.base_amount;
+                            row.source_document_type = item.source_document_type;
+                            row.source_document = item.source_document;
+                        });
+                        
+                        // Refresh the items table
+                        frm.refresh_field('items');
+                        console.log(`Added ${r.message.items.length} items from Gate Inward to the form`);
+                        frappe.msgprint(__('Items fetched from Gate Inward successfully'));
+                    } else {
+                        frappe.msgprint(__('No items were fetched. Please check if the Gate Inward has pending items.'));
+                    }
+                } else {
+                    console.log('Error fetching Gate Inward items:', r.message);
+                    let errorMsg = r.message && r.message.message ? r.message.message : 'Unknown error occurred';
+                    frappe.msgprint(__('Error: {0}').format(errorMsg));
                 }
             },
             error: function(r) {
+                console.log('Error response:', r);
                 let errorMsg = 'Unknown error occurred';
                 if (r.message) {
                     errorMsg = r.message;
@@ -257,20 +303,66 @@ function fetch_items_from_source(frm, source, source_name, d) {
         });
         d.hide();
     } else if (source === 'Purchase Quotation') {
-        // Handle Purchase Quotation
+        // Handle Purchase Quotation - use our new method that works with form data
+        console.log('Fetching items from Purchase Quotation:', source_name);
+        console.log('Purchase Receipt:', frm.doc.name);
+        
         frappe.call({
-            method: 'gate_pass.gate_pass_events.fetch_items_from_supplier_quotation',
+            method: 'gate_pass.gate_pass_events.fetch_items_from_supplier_quotation_for_form',
             args: {
-                'purchase_receipt': frm.doc.name,
+                'purchase_receipt_name': frm.doc.name,
                 'supplier_quotation': source_name
             },
             callback: function(r) {
-                if (r.message) {
-                    frm.reload_doc();
-                    frappe.msgprint(__('Items fetched from Purchase Quotation successfully'));
+                console.log('Fetch Purchase Quotation items response:', r);
+                
+                if (r.message && r.message.status === 'success') {
+                    console.log('Purchase Quotation items fetched successfully, adding to form...');
+                    
+                    // Set supplier if not already set
+                    if (r.message.supplier && !frm.doc.supplier) {
+                        frm.set_value('supplier', r.message.supplier);
+                    }
+                    
+                    // Clear existing items
+                    frm.clear_table('items');
+                    
+                    // Add new items to the form
+                    if (r.message.items && r.message.items.length > 0) {
+                        r.message.items.forEach(function(item) {
+                            let row = frm.add_child('items');
+                            row.item_code = item.item_code;
+                            row.item_name = item.item_name;
+                            row.description = item.description;
+                            row.qty = item.qty;
+                            row.received_qty = item.received_qty;
+                            row.uom = item.uom;
+                            row.stock_uom = item.stock_uom;
+                            row.conversion_factor = item.conversion_factor;
+                            row.warehouse = item.warehouse;
+                            row.rate = item.rate;
+                            row.base_rate = item.base_rate;
+                            row.amount = item.amount;
+                            row.base_amount = item.base_amount;
+                            row.supplier_quotation = item.supplier_quotation;
+                            row.supplier_quotation_item = item.supplier_quotation_item;
+                        });
+                        
+                        // Refresh the items table
+                        frm.refresh_field('items');
+                        console.log(`Added ${r.message.items.length} items from Purchase Quotation to the form`);
+                        frappe.msgprint(__('Items fetched from Purchase Quotation successfully'));
+                    } else {
+                        frappe.msgprint(__('No items were fetched. Please check if the Purchase Quotation has items.'));
+                    }
+                } else {
+                    console.log('Error fetching Purchase Quotation items:', r.message);
+                    let errorMsg = r.message && r.message.message ? r.message.message : 'Unknown error occurred';
+                    frappe.msgprint(__('Error: {0}').format(errorMsg));
                 }
             },
             error: function(r) {
+                console.log('Error response:', r);
                 let errorMsg = 'Unknown error occurred';
                 if (r.message) {
                     errorMsg = r.message;
